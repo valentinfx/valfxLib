@@ -2,9 +2,9 @@
 A personal Houdini package containing mostly HDAs and shelf tools, feel free to steal what you like!
 
 ## Installation
-- Create a folder named **packages** in your Houdini preferences
-- Copy **valfxLib.json** to the **packages** folder
-- Edit the json file so the path points to the **valfxLib** folder
+- Create a folder named **packages** in your Houdini preferences.
+- Copy **valfxLib.json** to the **packages** folder.
+- Edit the json file so the **VALFX_LIB** variable points to the **valfxLib** folder, which can be placed wherever you choose.
 
 ## HDAs
 
