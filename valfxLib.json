@@ -1,5 +1,11 @@
 {
   "recommends": "houdini_version >= '18.0'",
   "enable": true,
-  "path": ["D:/temp/valfxLib"]
+  "path" :
+    [
+        {
+            "value" : "D:/temp/valfxLib",
+            "method" : "append"
+        }
+    ]
 }
