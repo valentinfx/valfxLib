@@ -1,11 +1,17 @@
 {
   "recommends": "houdini_version >= '18.0'",
   "enable": true,
+  "env": [
+    {
+      "var": "VALFX_LIB",
+      "value": "D:/temp/valfxLib"
+    }
+  ],
   "path" :
-    [
-        {
-            "value" : "D:/temp/valfxLib",
-            "method" : "append"
-        }
-    ]
+  [
+    {
+      "value" : "$VALFX_LIB",
+      "method" : "append"
+    }
+  ]
 }
