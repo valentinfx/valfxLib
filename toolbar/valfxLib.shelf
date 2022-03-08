@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <toolshelf name="valfxLib" label="valfxLib">
+    <memberTool name="colorCode"/>
+    <memberTool name="stackTransforms"/>
+  </toolshelf>
+
+  <tool name="colorCode" label="Color Code" icon="hicon:/SVGIcons.index?PARTS_Colorwheel.svg">
+    <helpText><![CDATA[Applies a color code to selected nodes]]></helpText>
+    <script scriptType="python"><![CDATA[# Apply color based on node type name
+NODE_COLORS_MAPPING = {
+    'null': (1, .5, 0),
+    'subnet': (.71, .518, .004),
+    'filecache': (.98, .275, .275),
+    'object_merge': (.145, .667, .557),
+    'attribvop': (.475, .812, .204),
+    'attribwrangle': (.29, .565, .886),
+    'volumewrangle': (.29, .565, .886),
+    'timeshift': (.565, .494, .863)
+}
+
+# Apply color based node name prefix
+PREFIX_COLORS_MAPPING = {
+    'TEMP': (.996, .933, 0),
+    'VIS': (0.322, 0.259, 0.58),
+    'VIEWER': (0.094, 0.369, 0.69),
+    'RENDER': (0.322, 0.259, 0.58),
+    'USD': (.996, .933, 0),
+}
+
+for n in hou.selectedNodes():
+    for nodeTypeName, colorRgb in NODE_COLORS_MAPPING.items():
+        if n.type().name() == nodeTypeName:
+            n.setColor(hou.Color(colorRgb))
+
+    for prefix, colorRgb in PREFIX_COLORS_MAPPING.items():
+        if n.name().startswith(prefix):
+            n.setColor(hou.Color(colorRgb))
+
+    if n.type().name() == 'color':
+        colorRgb = (
+            n.parm('colorr').eval(),
+            n.parm('colorg').eval(),
+            n.parm('colorb').eval()
+        )
+        n.setColor(hou.Color(colorRgb))
+]]></script>
+  </tool>
+
+  <tool name="stackTransforms" label="Stack Transforms" icon="hicon:/SVGIcons.index?TOP_gatherall.svg">
+    <helpText><![CDATA[Select multiple transform SOPs to "merge" them to a single transform]]></helpText>
+    <script scriptType="python"><![CDATA[TRANSFORMS = {
+    'tx': 0,
+    'ty': 0,
+    'tz': 0,
+    'rx': 0,
+    'ry': 0,
+    'rz': 0,
+    'sx': 1,
+    'sy': 1,
+    'sz': 1,
+    'shear1': 0,
+    'shear2': 0,
+    'shear3': 0,
+    'scale': 1,
+    'px': 0,
+    'py': 0,
+    'pz': 0,
+    'prx': 0,
+    'pry': 0,
+    'prz': 0,
+    'prexform_tx': 0,
+    'prexform_ty': 0,
+    'prexform_tz': 0,
+    'prexform_rx': 0,
+    'prexform_ry': 0,
+    'prexform_rz': 0,
+    'prexform_sx': 1,
+    'prexform_sy': 1,
+    'prexform_sz': 1,
+    'prexform_shear1': 0,
+    'prexform_shear2': 0,
+    'prexform_shear3': 0,
+
+}
+
+MULTIPLICATIVE_PARMS = ['sx', 'sy', 'sz', 'scale', 'prexform_sx', 'prexform_sy', 'prexform_sz']
+
+
+def getTransforms(xforms=None):
+    """This will stack all of the selected transform nodes
+    and return a dict containing the stacked transforms
+    """
+    transforms = TRANSFORMS.copy()
+    for xform in xforms:
+        if not xform.parm('invertxform').evalAsInt():
+            for parmName in transforms.keys():
+                if parmName not in MULTIPLICATIVE_PARMS:
+                    transforms[parmName] += xform.parm(parmName).evalAsFloat()
+                else:
+                    transforms[parmName] *= xform.parm(parmName).evalAsFloat()
+        else:
+            for parmName in transforms.keys():
+                if parmName not in MULTIPLICATIVE_PARMS:
+                    transforms[parmName] -= xform.parm(parmName).evalAsFloat()
+                else:
+                    transforms[parmName] /= xform.parm(parmName).evalAsFloat()
+
+    return transforms
+
+
+def createStackedTransform(inputNode, transforms):
+    """Create a transform node that stacks all transforms
+    """
+    stackedTransform = inputNode.createOutputNode('xform')
+    stackedTransform.setName('stacked_transform', unique_name=True)
+    stackedTransform.setSelected(True, clear_all_selected=True)
+    
+    if inputNode.outputs():
+        outputNode = inputNode.outputs()[0]
+        outputNode.setFirstInput(stackedTransform)
+    
+    for parmName, value in transforms.items():
+        stackedTransform.parm(parmName).set(value)
+
+    return stackedTransform
+
+
+def cleanUp(toDelete, toMove):
+    """Clean up the graph by deleting old transform nodes and moving the new one"""
+    for n in toDelete:
+        n.destroy()
+
+    for n in toMove:
+        n.moveToGoodPosition()
+
+
+
+def run():
+    sel = [n for n in hou.selectedNodes() if n.type().name() == 'xform']
+    transforms = getTransforms(sel)
+    stackedTransform = createStackedTransform(sel[0], transforms)
+    cleanUp(sel, [stackedTransform])
+
+run()
+]]></script>
+  </tool>
+</shelfDocument>
