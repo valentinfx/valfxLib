@@ -21,7 +21,8 @@ NODE_COLORS_MAPPING = {
     'attribvop': (.475, .812, .204),
     'attribwrangle': (.29, .565, .886),
     'volumewrangle': (.29, .565, .886),
-    'timeshift': (.565, .494, .863)
+    'timeshift': (.565, .494, .863),
+    'groupcreate': (.094, .3, .8)
 }
 
 # Apply color based node name prefix
