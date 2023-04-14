@@ -172,15 +172,13 @@ def getSceneContext(sceneName):
     return match
 
 
-def incrementVersion():
+def increment(versionOrTake):
+    """This is the main function of this module and will increase the current scene version or take
+
+    :param versionOrTake: Can be either 'version' or 'take'
+    :type versionOrTake: str
+    """
     sceneName = getSceneName()
     scenePath = getScenePath()
     sceneContext = getSceneContext(sceneName)
-    incrementScene(scenePath, sceneContext, 'version')
-
-
-def incrementTake():
-    sceneName = getSceneName()
-    scenePath = getScenePath()
-    sceneContext = getSceneContext(sceneName)
-    incrementScene(scenePath, sceneContext, 'take')
+    incrementScene(scenePath, sceneContext, versionOrTake)
