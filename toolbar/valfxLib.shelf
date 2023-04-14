@@ -6,8 +6,9 @@
  a single file. -->
 
   <toolshelf name="valfxLib" label="valfxLib">
-    <memberTool name="colorCode"/>
-    <memberTool name="stackTransforms"/>
+    <memberTool name="incrementVersion0"/>
+    <memberTool name="incrementTake0"/>
+    <memberTool name="colorCode0"/>
   </toolshelf>
 
   <tool name="colorCode" label="Color Code" icon="hicon:/SVGIcons.index?PARTS_Colorwheel.svg">
@@ -53,102 +54,18 @@ for n in hou.selectedNodes():
 ]]></script>
   </tool>
 
-  <tool name="stackTransforms" label="Stack Transforms" icon="hicon:/SVGIcons.index?TOP_gatherall.svg">
-    <helpText><![CDATA[Select multiple transform SOPs to "merge" them to a single transform]]></helpText>
-    <script scriptType="python"><![CDATA[TRANSFORMS = {
-    'tx': 0,
-    'ty': 0,
-    'tz': 0,
-    'rx': 0,
-    'ry': 0,
-    'rz': 0,
-    'sx': 1,
-    'sy': 1,
-    'sz': 1,
-    'shear1': 0,
-    'shear2': 0,
-    'shear3': 0,
-    'scale': 1,
-    'px': 0,
-    'py': 0,
-    'pz': 0,
-    'prx': 0,
-    'pry': 0,
-    'prz': 0,
-    'prexform_tx': 0,
-    'prexform_ty': 0,
-    'prexform_tz': 0,
-    'prexform_rx': 0,
-    'prexform_ry': 0,
-    'prexform_rz': 0,
-    'prexform_sx': 1,
-    'prexform_sy': 1,
-    'prexform_sz': 1,
-    'prexform_shear1': 0,
-    'prexform_shear2': 0,
-    'prexform_shear3': 0,
+  <tool name="incrementVersion0" label="Incr. Version" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[from valfxLib import houdiniSaveUtils
+houdiniSaveUtils.incrementVersion()]]></script>
+  </tool>
 
-}
+  <tool name="incrementTake0" label="Incr. Take" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[from valfxLib import houdiniSaveUtils
+houdiniSaveUtils.incrementTake()]]></script>
+  </tool>
 
-MULTIPLICATIVE_PARMS = ['sx', 'sy', 'sz', 'scale', 'prexform_sx', 'prexform_sy', 'prexform_sz']
-
-
-def getTransforms(xforms=None):
-    """This will stack all of the selected transform nodes
-    and return a dict containing the stacked transforms
-    """
-    transforms = TRANSFORMS.copy()
-    for xform in xforms:
-        if not xform.parm('invertxform').evalAsInt():
-            for parmName in transforms.keys():
-                if parmName not in MULTIPLICATIVE_PARMS:
-                    transforms[parmName] += xform.parm(parmName).evalAsFloat()
-                else:
-                    transforms[parmName] *= xform.parm(parmName).evalAsFloat()
-        else:
-            for parmName in transforms.keys():
-                if parmName not in MULTIPLICATIVE_PARMS:
-                    transforms[parmName] -= xform.parm(parmName).evalAsFloat()
-                else:
-                    transforms[parmName] /= xform.parm(parmName).evalAsFloat()
-
-    return transforms
-
-
-def createStackedTransform(inputNode, transforms):
-    """Create a transform node that stacks all transforms
-    """
-    stackedTransform = inputNode.createOutputNode('xform')
-    stackedTransform.setName('stacked_transform', unique_name=True)
-    stackedTransform.setSelected(True, clear_all_selected=True)
-    
-    if inputNode.outputs():
-        outputNode = inputNode.outputs()[0]
-        outputNode.setFirstInput(stackedTransform)
-    
-    for parmName, value in transforms.items():
-        stackedTransform.parm(parmName).set(value)
-
-    return stackedTransform
-
-
-def cleanUp(toDelete, toMove):
-    """Clean up the graph by deleting old transform nodes and moving the new one"""
-    for n in toDelete:
-        n.destroy()
-
-    for n in toMove:
-        n.moveToGoodPosition()
-
-
-
-def run():
-    sel = [n for n in hou.selectedNodes() if n.type().name() == 'xform']
-    transforms = getTransforms(sel)
-    stackedTransform = createStackedTransform(sel[0], transforms)
-    cleanUp(sel, [stackedTransform])
-
-run()
-]]></script>
+  <tool name="colorCode0" label="Color Code" icon="hicon:/SVGIcons.index?LOP_lightfilterlibrary.svg">
+    <script scriptType="python"><![CDATA[from valfxLib import colorCode
+colorCode.applyColorCode()]]></script>
   </tool>
 </shelfDocument>

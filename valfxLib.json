@@ -3,15 +3,8 @@
   "enable": true,
   "env": [
     {
-      "var": "VALFX_LIB",
-      "value": "D:/temp/valfxLib"
+      "VALFX_LIB": "D:/temp/valfxLib"
     }
   ],
-  "path" :
-  [
-    {
-      "value" : "$VALFX_LIB",
-      "method" : "append"
-    }
-  ]
+  "hpath": "$VALFX_LIB"
 }
