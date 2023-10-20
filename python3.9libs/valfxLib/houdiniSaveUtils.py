@@ -63,12 +63,12 @@ def getScenePath():
 def confirmSave(newScenePath, newSceneName):
     """Check if the file already exists and ask user to confirm if he wants to overwrite
 
-    :param newScenePath:
-    :type newScenePath:
-    :param newSceneName:
-    :type newSceneName:
-    :return:
-    :rtype:
+    :param newScenePath: Path the scene would be saved to if these checks pass
+    :type newScenePath: str
+    :param newSceneName: Name of the new scene
+    :type newSceneName: str
+    :return: Whether the scene should be saved
+    :rtype: bool
     """
     if os.path.isfile(newScenePath):
         confirm = hou.ui.displayConfirmation(
